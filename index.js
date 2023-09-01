@@ -55,23 +55,41 @@ app.delete('/api/persons/:id', (request, response) => {
     response.status(204).end()
   })
 
-app.post('api/persons', (request, response) => {
+app.post('/api/persons', (request, response) => {
     const maxId = persons.length > 0
-    ? Math.max(...persons.map(p => p.id))
-    : 0
+        ? Math.max(...persons.map(p => p.id))
+        : 0
+    const body = request.body
 
-    const person = request.body
-    person.id = maxId + 1
-    if (persons.find(person)) {
-        response.status(404).end
+    const person = {
+        name: body.name,
+        number: body.number,
+        id: maxId + 1
     }
-    persons = persons.concat(person)
+    console.log(persons.some(p => p.name === body.name))
 
-    response.json(person)
-}) 
+    console.log(person.name)
+    if (persons.some(p => p.name === body.name)) {
+        return response.status(204).json({
+            error: 'Henkilö on jo puhelinluottelossa'
+        })
+    }
+    if (body.name === undefined || body.number === undefined) {
+        return response.status(204).json( {
+            error: 'You must give person name and number'
+        })
+    }
+
+    persons = persons.concat(person)
+    console.log(person)
+    response.json(persons)
+})
+
+
 
 
 
 const PORT = 3002
 app.listen(PORT)
 console.log(`Server running on port ${PORT}`)
+

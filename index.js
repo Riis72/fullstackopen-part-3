@@ -1,7 +1,27 @@
 const express = require('express')
 const app = express()
+const morgan = require('morgan')
+
+//
 
 app.use(express.json())
+const requestLogger = (request, response, next) => {
+    console.log('Method:', request.method)
+    console.log('Path:  ', request.path)
+    console.log('Body:  ', request.body)
+    console.log('---')
+    next()
+}
+app.use(requestLogger)
+morgan.token("json", function(req, res) {
+    return JSON.stringify(
+        req.body
+    )
+})
+
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :json'))
+
+
 
 let persons = [
     {
@@ -66,24 +86,22 @@ app.post('/api/persons', (request, response) => {
         number: body.number,
         id: maxId + 1
     }
-    console.log(persons.some(p => p.name === body.name))
-
-    console.log(person.name)
     if (persons.some(p => p.name === body.name)) {
-        return response.status(204).json({
+        return response.status(409).json({
             error: 'Henkilö on jo puhelinluottelossa'
         })
     }
     if (body.name === undefined || body.number === undefined) {
-        return response.status(204).json( {
-            error: 'You must give person name and number'
+        return response.status(412).json( {
+            error: 'Sinun pitää antaa henkilölle nimi ja puhelinnumero'
         })
     }
 
     persons = persons.concat(person)
-    console.log(person)
+
     response.json(persons)
 })
+
 
 
 

@@ -1,18 +1,15 @@
 const express = require('express')
 const app = express()
 const morgan = require('morgan')
+const cors = require('cors')
+
+app.use(cors())
+app.use(express.static('dist'))
 
 //
 
 app.use(express.json())
-const requestLogger = (request, response, next) => {
-    console.log('Method:', request.method)
-    console.log('Path:  ', request.path)
-    console.log('Body:  ', request.body)
-    console.log('---')
-    next()
-}
-app.use(requestLogger)
+
 morgan.token("json", function(req, res) {
     return JSON.stringify(
         req.body
@@ -55,7 +52,6 @@ app.get('/api/persons', (request, response) => {
 app.get('/info', (request, response) => {
     response.send(`<p>Phonebook has info for ${persons.length} people</p> <p>${new Date()}</p> `)
 })
-
 app.get('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id)
     const person = persons.find(person => person.id === id)
@@ -88,18 +84,18 @@ app.post('/api/persons', (request, response) => {
     }
     if (persons.some(p => p.name === body.name)) {
         return response.status(409).json({
-            error: 'Henkilö on jo puhelinluottelossa'
+            error: 'Person is already in phonebook'
         })
     }
     if (body.name === undefined || body.number === undefined) {
         return response.status(412).json( {
-            error: 'Sinun pitää antaa henkilölle nimi ja puhelinnumero'
+            error: 'You need to give name and number to the person'
         })
     }
 
     persons = persons.concat(person)
 
-    response.json(persons)
+    response.json(person)
 })
 
 
@@ -107,7 +103,7 @@ app.post('/api/persons', (request, response) => {
 
 
 
-const PORT = 3002
+const PORT = process.env.PORT || 3002
 app.listen(PORT)
 console.log(`Server running on port ${PORT}`)
 

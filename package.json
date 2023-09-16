@@ -8,7 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon index.js",
     "build:ui": "rm -rf dist && cd ../Fullstackopen/part2/puhelinluettelo && npm run build && cp -r dist ../fullstackopen-part-3-main",
-    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push"
+    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push",
+    "lint": "eslint ."
   },
   "author": "",
   "license": "ISC",
@@ -20,6 +21,8 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
+    "eslint": "^8.49.0",
+    "eslint-plugin-react": "^7.33.2",
     "nodemon": "^3.0.1"
   }
 }
